@@ -3,7 +3,7 @@
 	xmlns="http://java.sun.com/xml/ns/javaee"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
 	version="3.0">
-	<display-name>tp1</display-name>
+	<display-name>tp</display-name>
 
 	<!-- Spring -->
 
@@ -21,7 +21,7 @@
 		<filter-class>spark.servlet.SparkFilter</filter-class>
 		<init-param>
 			<param-name>applicationClass</param-name>
-			<param-value>fr.codevallee.formation.tp1.Router</param-value>
+			<param-value>fr.codevallee.formation.tp.Router</param-value>
 		</init-param>
 	</filter>
 
