@@ -16,6 +16,8 @@ public class Demo {
 	private Integer id;
 
 	private String nom;
+	private String prenom;
+	private String civilite;
 
 	public String getNom() {
 		return nom;
@@ -23,6 +25,22 @@ public class Demo {
 
 	public void setNom(String nom) {
 		this.nom = nom;
+	}
+
+	public String getPrenom() {
+		return prenom;
+	}
+
+	public void setPrenom(String prenom) {
+		this.prenom = prenom;
+	}
+
+	public String getCivilite() {
+		return civilite;
+	}
+
+	public void setCivilite(String civilite) {
+		this.civilite = civilite;
 	}
 
 }
