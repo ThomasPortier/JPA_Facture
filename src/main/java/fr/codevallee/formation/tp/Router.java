@@ -1,11 +1,11 @@
 package fr.codevallee.formation.tp;
 
-import static spark.Spark.get;
-
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -13,195 +13,116 @@ import javax.persistence.Persistence;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
-import fr.codevallee.formation.tp.modele.Commune;
-import fr.codevallee.formation.tp.modele.Demo;
-import fr.codevallee.formation.tp.modele.Elu;
-import fr.codevallee.formation.tp.modele.Maire;
 import freemarker.template.Configuration;
 import freemarker.template.Version;
 import spark.ModelAndView;
 import spark.servlet.SparkApplication;
 import spark.template.freemarker.FreeMarkerEngine;
 
+import org.hibernate.sql.ordering.antlr.Factory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.context.request.FacesRequestAttributes;
+
+import fr.codevallee.formation.tp.modele.Adresse;
+import fr.codevallee.formation.tp.modele.Article;
+import fr.codevallee.formation.tp.modele.ArticleDescription;
+import fr.codevallee.formation.tp.modele.Client;
+import fr.codevallee.formation.tp.modele.Facture;
+import fr.codevallee.formation.tp.modele.LigneDeFacture;
+import fr.codevallee.formation.tp.modele.Status;
 
 public class Router implements SparkApplication {
 
 	public void init() {
 
-		Map<String, Object> attributes = new HashMap<>();
 		EntityManagerFactory emf = Persistence.createEntityManagerFactory("formation");
 		EntityManager em = emf.createEntityManager();
-		TypedQuery<Demo> query = em.createQuery("from Demo", Demo.class);
-		attributes.put("objets", query.getResultList());
 
-		// Commune uneCommune = new Commune();
-		// uneCommune.setNom("Cregftrezhgfdst");
-		// Commune uneAutreCommune = new Commune();
-		// uneAutreCommune.setNom("Valytgrfertytrenjhgfce");
-		//
-		// Maire unMaire = new Maire();
-		// unMaire.setNom("Monbugfdytregfdisson");
-		// Maire unAutreMaire = new Maire();
-		// unAutreMaire.setNom("Marjhhgfdsgfmgfdelade");
-		//
-		// //uneCommune.setMaire(unMaire);
-		// //uneAutreCommune.setMaire(unAutreMaire);
-		//
-		// unMaire.setCommune(uneCommune);
-		// unAutreMaire.setCommune(uneAutreCommune);
-		//
-		//
-		// em.getTransaction().begin();
-		// em.persist(unMaire);
-		// em.persist(unAutreMaire);
-		// em.persist(uneAutreCommune);
-		// em.persist(uneCommune);
-		// em.getTransaction().commit();
-		// em.close();
+		///////////////////////////////////////////////////////////////////////////////////////
 
-		get("/ajouter", (request, response) -> {
-			return new ModelAndView(attributes, "ajouter.ftl");
-		}, getFreeMarkerEngine());
+		// CREATE ADRESSE
+		Adresse uneAdresse = new Adresse("La Taverne", "Kaamelott", 88888, "Royaume de Bretagne");
+		Adresse uneAutreAdresse = new Adresse("Le Chateau", "Kaamelott", 88888, "Royaume de Bretagne");
+		
+		
+		
+		// CREATE CLIENT
+		Client unClient = new Client("De Vannes", "Karadic", uneAdresse);
+		Client unAutreClient = new Client("De Galle", "Perceval", uneAutreAdresse);
 
-		get("/resultat_ajouter", (request, response) -> {
-			String nomCommune = request.queryParams("nomCommune");
-			String nomMaire = request.queryParams("nomMaire");
+		///////////////////////////////////////////////////////////////////////////////////////////
 
-			Maire unMaire = new Maire();
-			unMaire.setNom(nomMaire);
+		// CREATE ARTICLE DESCRIPTION
+		ArticleDescription uneDescription = new ArticleDescription("Graal","Bocal a anchois ou une pierre incandescente");
+		ArticleDescription uneAutreDescription = new ArticleDescription("Catapulte","Grosse Catapulte a ne pas monter dans l'enceinte de chateau");
 
-			Commune uneCommune = new Commune();
-			uneCommune.setNom(nomCommune);
+		// CREATE ARTICLE
+		Article unArticle = new Article(24.5, 8765432, uneDescription);
+		Article unAutreArticle = new Article(655, 3425432, uneDescription);
+		Article unFinalArticle = new Article(3420, 3487902, uneAutreDescription);
 
-			unMaire.setCommune(uneCommune);
+		///////////////////////////////////////////////////////////////////////////////////////
 
-			em.getTransaction().begin();
-			em.persist(uneCommune);
-			em.persist(unMaire);
-			em.getTransaction().commit();
-			em.close();
+		Date uneDate = new Date();
 
-			attributes.put("nomCommune", nomCommune);
-			attributes.put("nomMaire", nomMaire);
+		// CREATE LIGNE FACTURE
 
-			return new ModelAndView(attributes, "resultat_ajouter.ftl");
-		}, getFreeMarkerEngine());
+		LigneDeFacture uneLigneFacture = new LigneDeFacture(5, unArticle);
+		LigneDeFacture uneAutreLigneFacture = new LigneDeFacture(3, unAutreArticle);
+		LigneDeFacture uneFinalLigneFacture = new LigneDeFacture(8, unFinalArticle);
 
-		get("/supprimer", (request, response) -> {
-			return new ModelAndView(attributes, "supprimer.ftl");
-		}, getFreeMarkerEngine());
+		Set<LigneDeFacture> listeLigneFacture = new HashSet<LigneDeFacture>();
+		Set<LigneDeFacture> autreListeLigneFacture = new HashSet<LigneDeFacture>();
 
-		get("/resultat_supprimer", (request, response) -> {
-			int idMaireInt = Integer.parseInt(request.queryParams("id"));
-			System.out.println(idMaireInt);
-			//String idMaire = request.queryParams("id");
-			//int idMaireInt = Integer.parseInt(idMaire);
-			//Id supprimé ${idMaire} 
-			Maire unMaireToDelete = em.find(Maire.class, idMaireInt);
-			//System.out.println(unMaireToDelete);
-			
-			em.getTransaction().begin();
-			em.remove(unMaireToDelete);
-			em.getTransaction().commit();
-			em.close();
-			
-			//attributes.put("id", idMaire);
-			return new ModelAndView(attributes, "resultat_supprimer.ftl");
-		}, getFreeMarkerEngine());
+		listeLigneFacture.add(uneLigneFacture);
+		listeLigneFacture.add(uneAutreLigneFacture);
+		
+		autreListeLigneFacture.add(uneFinalLigneFacture);
 
-		get("/home", (request, response) -> {
-			// System.out.println(listePersonne);
-			attributes.put("objets", query.getResultList());
-			return new ModelAndView(attributes, "home.ftl");
-		}, getFreeMarkerEngine());
+		Facture uneFacture = new Facture(unClient, uneDate, uneAdresse, listeLigneFacture, Status.NONPAYE);
+		Facture uneAutreFacture = new Facture(unAutreClient, uneDate, uneAutreAdresse, autreListeLigneFacture, Status.NONPAYE);
+		
+
+		// ASSIGNED ADRESSE TO CLIENT
+		//unClient.setAdresseLivraison(uneAdresse);
+		//unAutreClient.setAdresseLivraison(uneAutreAdresse);
+
+		// LINK TO DATABASE
+		em.getTransaction().begin();
+		// SEND STUFF TO DATABASE
+		
+		em.persist(uneAdresse);
+		em.persist(uneAutreAdresse);
+		
+		em.persist(unClient);
+		em.persist(unAutreClient);
+
+		em.persist(uneDescription);
+		em.persist(uneAutreDescription);
+
+		em.persist(unArticle);
+		em.persist(unAutreArticle);
+		em.persist(unFinalArticle);
+
+
+		em.persist(uneLigneFacture);
+		em.persist(uneAutreLigneFacture);
+		em.persist(uneFinalLigneFacture);
+
+		em.persist(uneFacture);
+		em.persist(uneAutreFacture);
+
+		em.getTransaction().commit();
+
+		Query query = em.createQuery("from Client", Client.class);
+		Query query2 = em.createQuery("from Facture", Facture.class);
+		
+		System.out.println(query.getResultList());
+		System.out.println(query2.getResultList());
+		em.close();
+
 	}
 
-	private FreeMarkerEngine getFreeMarkerEngine() {
-		FreeMarkerEngine engine = new FreeMarkerEngine();
-		Configuration configuration = new Configuration(new Version(2, 3, 23));
-		configuration.setTemplateUpdateDelayMilliseconds(Long.MAX_VALUE);
-		configuration.setClassForTemplateLoading(FreeMarkerEngine.class, "");
-		engine.setConfiguration(configuration);
-		return engine;
-	}
+
 }
-
-//
-// Elu unElu2 = new Elu();
-// unElu2.setNom("Vladimir");
-//
-// Elu unAutreElu = new Elu();
-// unAutreElu.setNom("Rodrigue");
-//
-//
-//
-//
-//
-// em.getTransaction().begin();
-// em.persist(unElu2);
-// em.persist(unAutreElu);
-// em.remove(unElu);
-// em.getTransaction().commit();
-// em.close();
-
-// final Logger logger = LoggerFactory.getLogger(Router.class);
-//
-// get("/exemple1", (request, response) -> {
-//
-// logger.debug("start");
-//
-// Map<String, Object> attributes = new HashMap<>();
-//
-// // Exemple 1 (à déplacer dans une classe statique !):
-// EntityManagerFactory entityManagerFactory =
-// Persistence.createEntityManagerFactory("formation");
-// EntityManager entityManager = entityManagerFactory.createEntityManager();
-//
-//
-// // J'ajoute un métier :
-// Demo metier = new Demo();
-// metier.setNom("exemple1");
-//
-// TypedQuery<Demo> query = entityManager.createQuery("from Demo", Demo.class);
-// attributes.put("objets", query.getResultList());
-//
-// entityManager.getTransaction().begin();
-// entityManager.persist(metier);
-// entityManager.getTransaction().commit();
-// entityManager.close();
-//
-// return new ModelAndView(attributes, "home.ftl");
-// }, getFreeMarkerEngine());
-
-/////////////////////////////////////////////////////////////////////////////////
-
-// get("/lecture", (request, response) -> {
-// Map<String, Object> attributes = new HashMap<>();
-// return new ModelAndView(attributes, "lecture.ftl");
-// }, getFreeMarkerEngine());
-//
-// get("/update", (request, response) -> {
-// Map<String, Object> attributes = new HashMap<>();
-// return new ModelAndView(attributes, "update.ftl");
-// }, getFreeMarkerEngine());
-//
-// get("/suppression", (request, response) -> {
-// Map<String, Object> attributes = new HashMap<>();
-// return new ModelAndView(attributes, "suppression.ftl");
-// }, getFreeMarkerEngine());
-
-///////////////////////////////////////////////////////////////////////////////////
-
-//// List<String> listePersonne = entityManager.createQuery("SELECT nom FROM
-//// Demo").getResultList();
-
-/////////////////////////////////////////////////////////////////////////////////////
-//
-//// <thead><th>Civilite</th><th>Nom</th><th>Prenom</th></thead>
-////
-// </tbody>
-// <thead><th>Civilite</th><th>Nom</th><th>Prenom</th></thead>
-
-// <td>${obj.prenom}</td><td>${obj.civilite}</td>

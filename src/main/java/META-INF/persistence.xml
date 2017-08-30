@@ -4,9 +4,9 @@
 	<persistence-unit name="formation" transaction-type="RESOURCE_LOCAL">
 		<properties>
 			<property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />
-			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost/base_tp"/>
+			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost/base_facture"/>
 			<property name="javax.persistence.jdbc.user" value="root"/>
-			<property name="javax.persistence.jdbc.password" value="6390"/>
+			<property name="javax.persistence.jdbc.password" value="root"/>
 			
 
 		    <property name="hibernate.show_sql" value="true" />
@@ -17,3 +17,5 @@
 		</properties>
 	</persistence-unit>
 </persistence>
+
+
